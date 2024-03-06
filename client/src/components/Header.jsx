@@ -32,6 +32,11 @@ export default function Header() {
               Contact Us
             </li>
           </Link>
+          <Link to={"/sign-up"}>
+            <li className="text-zinc-300 hidden sm:inline hover:text-orange-500">
+              Sign Up
+            </li>
+          </Link>
         </ul>
       </div>
     </header>
