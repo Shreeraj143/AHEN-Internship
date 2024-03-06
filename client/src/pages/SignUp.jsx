@@ -1,42 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { notifyError, notifySuccess } from "../utils/Notifications";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
-    });
-  };
-
-  const notifyError = (message) => {
-    toast.error(message, {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
-
-  const notifySuccess = (message) => {
-    toast.success(message, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
     });
   };
 
@@ -55,16 +28,15 @@ export default function SignUp() {
       const data = await res.json();
 
       if (data.success === false) {
-        setError(data.message);
+        notifyError(data.message);
         setLoading(false);
         return;
       }
 
       notifySuccess("User has been registered successfully.");
-      setError(null);
       setLoading(false);
     } catch (error) {
-      setError(error.message);
+      notifyError(error.message);
       setLoading(false);
     }
   };
@@ -79,6 +51,7 @@ export default function SignUp() {
             Username
           </label>
           <input
+            required
             type="text"
             name="username"
             id="username"
@@ -92,6 +65,7 @@ export default function SignUp() {
             Email
           </label>
           <input
+            required
             type="email"
             name="email"
             id="email"
@@ -105,6 +79,7 @@ export default function SignUp() {
             Password
           </label>
           <input
+            required
             type="password"
             name="password"
             id="password"
@@ -131,7 +106,6 @@ export default function SignUp() {
           </span>
         </Link>
       </div>
-      {error && <p className="text-red-600 mt-5">{error}</p>}
     </div>
   );
 }
