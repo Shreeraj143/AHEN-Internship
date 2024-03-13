@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   getDownloadURL,
@@ -8,14 +8,22 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import { notifyError, notifySuccess } from "../utils/Notifications";
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccessfull,
+} from "../redux/user/userSlice";
 
 export default function Profile() {
   const fileRef = useRef(null);
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (file) {
@@ -47,12 +55,44 @@ export default function Profile() {
     );
   };
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart);
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+        notifyError(data.message);
+        return;
+      }
+
+      notifySuccess("Updated Successfully!");
+      dispatch(updateUserSuccessfull(data));
+      setUpdateSuccess(true);
+    } catch (error) {
+      dispatch(updateUserFailure(data.message));
+      notifyError(error.message);
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-cyan-500 uppercase">
         Profile
       </h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -72,7 +112,7 @@ export default function Profile() {
               Error Image upload (image must be less than 2 mb)
             </span>
           ) : filePerc > 0 && filePerc < 100 ? (
-            <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
+            <span className="text-white">{`Uploading ${filePerc}%`}</span>
           ) : filePerc === 100 ? (
             <span className="text-green-600">Image successfully uploaded!</span>
           ) : (
@@ -85,6 +125,8 @@ export default function Profile() {
           id="username"
           placeholder="Username"
           className="outline-none p-3 rounded-lg"
+          defaultValue={currentUser.username}
+          onChange={handleChange}
         />
         <input
           type="email"
@@ -92,6 +134,8 @@ export default function Profile() {
           id="email"
           placeholder="Email"
           className="outline-none p-3 rounded-lg"
+          defaultValue={currentUser.email}
+          onChange={handleChange}
         />
         <input
           type="password"
@@ -99,9 +143,13 @@ export default function Profile() {
           id="password"
           placeholder="Password"
           className="outline-none p-3 rounded-lg"
+          onChange={handleChange}
         />
-        <button className="bg-rose-600 text-white p-3 rounded-lg mt-5 hover:opacity-90 disabled:opacity-80 uppercase">
-          Update
+        <button
+          disabled={loading}
+          className="bg-rose-600 text-white p-3 rounded-lg mt-5 hover:opacity-90 disabled:opacity-80 uppercase"
+        >
+          {loading ? "Updating..." : "Update"}
         </button>
       </form>
       <div className="text-white flex justify-between mt-5">

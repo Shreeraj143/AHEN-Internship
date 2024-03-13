@@ -43,12 +43,12 @@ export default function SignUp() {
   };
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-4xl text-center text-cyan-500 uppercase font-semibold my-9">
+      <h1 className="text-4xl text-center text-white uppercase font-semibold my-9">
         Sign Up
       </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="username flex flex-col gap-2 uppercase">
-          <label htmlFor="username" className="text-rose-600">
+          <label htmlFor="username" className="text-white">
             Username
           </label>
           <input
@@ -62,7 +62,7 @@ export default function SignUp() {
           />
         </div>
         <div className="email flex flex-col gap-2 uppercase">
-          <label htmlFor="email" className="text-rose-600">
+          <label htmlFor="email" className="text-white">
             Email
           </label>
           <input
@@ -76,7 +76,7 @@ export default function SignUp() {
           />
         </div>
         <div className="password flex flex-col gap-2 uppercase">
-          <label htmlFor="password" className="text-rose-600">
+          <label htmlFor="password" className="text-white">
             Password
           </label>
           <input
