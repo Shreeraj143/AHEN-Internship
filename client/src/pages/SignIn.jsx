@@ -7,6 +7,7 @@ import {
   signInStart,
   signInSuccessfull,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -89,9 +90,7 @@ export default function SignUp() {
         >
           {loading ? "Signing In" : "Sign In"}
         </button>
-        <button className="bg-blue-600 text-white p-3 rounded-lg hover:opacity-90 disabled:opacity-65">
-          Sign In with Google
-        </button>
+        <OAuth />
       </form>
       <div className="text-white mt-3 flex gap-2 justify-center">
         <p>Don't have an account?</p>
